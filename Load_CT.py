@@ -1,7 +1,9 @@
 import numpy as np 
 import pydicom
 import os
+import pathlib
 import glob
+import pickle
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
 import matplotlib.pyplot as plt 
@@ -61,16 +63,17 @@ def FindROINumber(metadata, containsList):
             
     return 1111 #keyword for didn't find anything
 
-def Load_Data(patientsPath, containsList):
+def Load_Data(patientsPath, containsList, save =True):
     #Get list of patient folders: 
-    patientFolders = os.listdir(patientsPath)
+    filesFolder = os.path.join(pathlib.Path(__file__).parent.absolute(), patientsPath)
+    patientFolders = os.listdir(filesFolder)
     trainImages = []
     trainContours = []
     trainCombinedImages = []
 
     for p in range(len(patientFolders)):
         #Load the first patient
-        patient = sorted(glob.glob(patientsPath + '/' + patientFolders[p] +'/*'))
+        patient = sorted(glob.glob(os.path.join(filesFolder, patientFolders[p], "*")))
         patient_CTs = []
         patient_Struct = []
 
@@ -80,7 +83,6 @@ def Load_Data(patientsPath, containsList):
                 patient_CTs.append(fileName)
             elif "STRUCT" in fileName:
                 patient_Struct.append(fileName)    
-
         #going to need the reference frame for the CT images, so get Image Position Patient and Image Orientation Patient
         #fix later, but for now assume that the files are in standard form for orientation (first dimension x axis , second y...)
         iop = dcmread(patient_CTs[0]).get("ImageOrientationPatient")
@@ -169,12 +171,20 @@ def Load_Data(patientsPath, containsList):
         trainImages.append(CTs)
         trainContours.append(contourImages)
         trainCombinedImages.append(combinedImages)
+        #If wanted, save the objects
+        if save == True:
+            with open(os.path.join(pathlib.Path(__file__).parent.absolute(), "SavedImages/trainImages.txt"), "wb") as fp:
+                pickle.dump(trainImages, fp)
+            with open(os.path.join(pathlib.Path(__file__).parent.absolute(), "SavedImages/trainContours.txt"), "wb") as fp:
+                pickle.dump(trainContours, fp)
+            with open(os.path.join(pathlib.Path(__file__).parent.absolute(), "SavedImages/trainCombinedImages.txt"), "wb") as fp:
+                pickle.dump(trainCombinedImages, fp)
     return trainImages, trainContours, trainCombinedImages
 
 def main():
-    path = 'path to patients'
+    path = 'Patient_Files/'
     organKeywords = ["body"]
-    trainImages, trainContours, trainCombinedImages = Load_Data(path, organKeywords)
+    trainImages, trainContours, trainCombinedImages = Load_Data(path, organKeywords, save=True)
     #Plot a CT scan with the contour: 
     plt.imshow(trainImages[0][57][0], cmap = "gray")
     plt.show()
