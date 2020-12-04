@@ -172,7 +172,7 @@ def Load_Data(patientsPath, containsList):
     return trainImages, trainContours, trainCombinedImages
 
 def main():
-    path = '/home/calebsample/Documents/UBC/AutoContouring/Patient_Files/'
+    path = 'path to patients'
     organKeywords = ["body"]
     trainImages, trainContours, trainCombinedImages = Load_Data(path, organKeywords)
     #Plot a CT scan with the contour: 
