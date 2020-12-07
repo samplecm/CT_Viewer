@@ -181,14 +181,20 @@ def Load_Data(patientsPath, containsList, save =True):
                 pickle.dump(trainCombinedImages, fp)
     return trainImages, trainContours, trainCombinedImages
 
-def main():
+def LoadData(load = False):
     path = 'Patient_Files/'
     organKeywords = ["body"]
-    trainImages, trainContours, trainCombinedImages = Load_Data(path, organKeywords, save=True)
+    if load == False:
+        trainImages, trainContours, trainCombinedImages = Load_Data(path, organKeywords, save=True)
+    else:
+        trainImages = pickle.load(open(os.path.join(pathlib.Path(__file__).parent.absolute(), "SavedImages/trainImages.txt"), 'rb'))
+        trainContours = pickle.load(open(os.path.join(pathlib.Path(__file__).parent.absolute(), "SavedImages/trainContours.txt"), 'rb'))
+        trainCombinedImages = pickle.load(open(os.path.join(pathlib.Path(__file__).parent.absolute(), "SavedImages/trainCombinedImages.txt"), 'rb'))    
     #Plot a CT scan with the contour: 
     plt.imshow(trainImages[0][57][0], cmap = "gray")
     plt.show()
     plt.imshow(trainContours[0][57], cmap = "gray")
     plt.show()
+
 if __name__ == "__main__":
-    main()
+    LoadData(load = True)
