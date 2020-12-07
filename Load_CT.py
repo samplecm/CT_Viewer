@@ -106,8 +106,6 @@ def Load_Data(patientsPath, containsList, save =True):
 
 
 
-        #Now get the oral Cavity from the structure set and store as array
-
         structsMeta = dcmread(patient_Struct[0]).data_element("ROIContourSequence")
         oC_Number= FindROINumber(dcmread(patient_Struct[0]).data_element("StructureSetROISequence"), containsList)
         #print(dcmread(patient1_Struct[0]).data_element("ROIContourSequence")[0])
